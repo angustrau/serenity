@@ -1,0 +1,7 @@
+image:
+  file: Meta/Gitpod/Dockerfile
+tasks:
+  - init: |
+      Toolchain/BuildQemu.sh
+      Meta/serenity.sh rebuild-toolchain
+      Meta/serenity.sh build
