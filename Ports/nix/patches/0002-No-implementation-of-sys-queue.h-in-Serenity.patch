@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Emily Trau <emily@downunderctf.com>
+Date: Wed, 7 Jun 2023 13:58:31 -0700
+Subject: [PATCH] No implementation of `<sys/queue.h>` in Serenity
+
+Serenity currently doesn't have an implementation of `<sys/queue.h>`,
+a dependency for lowdown. The lowdown CLI tool detects that `<sys/queue.h>`
+isn't available during `configure` and adds a built-in implementation.
+However lowdown doesn't include its compatibility shims when used
+as a library via `lowdown.h`. Nix worked around this issue by adding
+`#include <sys/queue.h>` before importing `lowdown.h`. We can hack
+around this by just stubbing out uses of `<sys/queue.h>` functionality
+till we have a Serenity equivalent. :)
+---
+ src/libcmd/markdown.cc | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/libcmd/markdown.cc b/src/libcmd/markdown.cc
+index 668a077632c9b4b08dc5912feee43c10818ce486..64181f2e74df1556b9edf9ea4e7df1d1b1705166 100644
+--- a/src/libcmd/markdown.cc
++++ b/src/libcmd/markdown.cc
+@@ -2,7 +2,8 @@
+ #include "util.hh"
+ #include "finally.hh"
+ 
+-#include <sys/queue.h>
++#define TAILQ_ENTRY(x)     char*
++#define TAILQ_HEAD(x,y)    struct x {};
+ #include <lowdown.h>
+ 
+ namespace nix {

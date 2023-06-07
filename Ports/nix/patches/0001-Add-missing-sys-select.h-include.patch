@@ -1,0 +1,25 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Emily Trau <emily@downunderctf.com>
+Date: Wed, 7 Jun 2023 13:55:15 -0700
+Subject: [PATCH] Add missing <sys/select.h> include
+
+`select()` may not be ambiently available for use on every platform
+
+Merged upstream post-`2.16.1` and will be included in the next release
+https://github.com/NixOS/nix/pull/8456
+---
+ src/nix/daemon.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/nix/daemon.cc b/src/nix/daemon.cc
+index c1a91c63d8cec8d2e5aa8e06981dc5eb696bfd22..9fe9b3b1e60639589d833d050dc0d85eb6c67dda 100644
+--- a/src/nix/daemon.cc
++++ b/src/nix/daemon.cc
+@@ -24,6 +24,7 @@
+ #include <sys/stat.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
++#include <sys/select.h>
+ #include <errno.h>
+ #include <pwd.h>
+ #include <grp.h>

@@ -134,6 +134,12 @@ if [ -f mnt/bin/network-settings ]; then
     chmod 500 mnt/bin/network-settings
 fi
 
+if [ -f mnt/usr/local/bin/nix ] && [ ! -d mnt/nix ]; then
+  printf "installing nix... "
+  mkdir -p mnt/nix
+  chown 100:100 mnt/nix
+fi
+
 chmod 600 mnt/etc/shadow
 chmod 755 mnt/res/devel/templates/*.postcreate
 echo "done"
