@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
+#include "AK/Format.h"
 #include <Kernel/API/POSIX/fcntl.h>
 #include <Kernel/API/Syscall.h>
 #include <arpa/inet.h>

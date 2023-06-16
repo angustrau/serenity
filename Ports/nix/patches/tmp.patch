@@ -1,0 +1,73 @@
+diff --git a/src/libmain/stack.cc b/src/libmain/stack.cc
+index 10f71c1dc..e12c52ed3 100644
+--- a/src/libmain/stack.cc
++++ b/src/libmain/stack.cc
+@@ -45,7 +45,7 @@ static void sigsegvHandler(int signo, siginfo_t * info, void * ctx)
+ 
+ void detectStackOverflow()
+ {
+-#if defined(SA_SIGINFO) && defined (SA_ONSTACK)
++#if defined(SA_SIGINFO) && defined (SA_ONSTACK) && !defined(__serenity__)
+     /* Install a SIGSEGV handler to detect stack overflows.  This
+        requires an alternative stack, otherwise the signal cannot be
+        delivered when we're out of stack space. */
+diff --git a/src/libstore/globals.cc b/src/libstore/globals.cc
+index 32e9a6ea9..264cbd6c9 100644
+--- a/src/libstore/globals.cc
++++ b/src/libstore/globals.cc
+@@ -119,7 +119,7 @@ std::vector<Path> getUserConfigFiles()
+ 
+ unsigned int Settings::getDefaultCores()
+ {
+-    const unsigned int concurrency = std::max(1U, std::thread::hardware_concurrency());
++    const unsigned int concurrency = 1U;// std::max(1U, std::thread::hardware_concurrency());
+     const unsigned int maxCPU = getMaxCPU();
+ 
+     if (maxCPU > 0)
+@@ -240,7 +240,7 @@ template<> void BaseSetting<SandboxMode>::convertToArg(Args & args, const std::s
+ 
+ unsigned int MaxBuildJobsSetting::parse(const std::string & str) const
+ {
+-    if (str == "auto") return std::max(1U, std::thread::hardware_concurrency());
++    if (str == "auto") return 1U; // std::max(1U, std::thread::hardware_concurrency());
+     else {
+         if (auto n = string2Int<decltype(value)>(str))
+             return *n;
+diff --git a/src/libutil/thread-pool.cc b/src/libutil/thread-pool.cc
+index dc4067f1b..b9004bb7e 100644
+--- a/src/libutil/thread-pool.cc
++++ b/src/libutil/thread-pool.cc
+@@ -6,9 +6,10 @@ ThreadPool::ThreadPool(size_t _maxThreads)
+     : maxThreads(_maxThreads)
+ {
+     if (!maxThreads) {
+-        maxThreads = std::thread::hardware_concurrency();
++        maxThreads = 1; // std::thread::hardware_concurrency();
+         if (!maxThreads) maxThreads = 1;
+     }
++    maxThreads = 1;
+ 
+     debug("starting pool of %d threads", maxThreads - 1);
+ }
+diff --git a/src/libutil/util.cc b/src/libutil/util.cc
+index aa0a154fd..46ece06d7 100644
+--- a/src/libutil/util.cc
++++ b/src/libutil/util.cc
+@@ -646,7 +646,7 @@ std::optional<Path> getSelfExe()
+ {
+     static auto cached = []() -> std::optional<Path>
+     {
+-        #if __linux__
++        #if __linux__ || __serenity__
+         return readLink("/proc/self/exe");
+         #elif __APPLE__
+         char buf[1024];
+@@ -1301,7 +1301,7 @@ void runProgram2(const RunOptions & options)
+ 
+ void closeMostFDs(const std::set<int> & exceptions)
+ {
+-#if __linux__
++#if __linux__ || __serenity__
+     try {
+         for (auto & s : readDirectory("/proc/self/fd")) {
+             auto fd = std::stoi(s.name);

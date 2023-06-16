@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "AK/Format.h"
 #include <Kernel/API/POSIX/futex.h>
 #include <Kernel/API/POSIX/serenity.h>
 #include <stdio.h>
@@ -39,6 +40,9 @@ static ALWAYS_INLINE int futex_wait(uint32_t* userspace_address, uint32_t value,
             op |= FUTEX_CLOCK_REALTIME;
     } else {
         op = FUTEX_WAIT;
+    }
+    if (*userspace_address > UINT_MAX) {
+        dbgln("FUTEX OHOH");
     }
     return futex(userspace_address, op | (process_shared ? 0 : FUTEX_PRIVATE_FLAG), value, abstime, NULL, FUTEX_BITSET_MATCH_ANY);
 }
